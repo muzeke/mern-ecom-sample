@@ -1,7 +1,7 @@
 {
-  "name": "mern-ecommerce",
+  "name": "e-produkto",
   "version": "1.0.0",
-  "description": "MERN Ecommerce",
+  "description": "prod",
   "main": "server/index.js",
   "scripts": {
     "clean": "rimraf dist",
@@ -28,12 +28,8 @@
     "redux-thunk",
     "webpack"
   ],
-  "author": "Mohamed Samara (https://github.com/mohamedsamara)",
+  "author": "Adirel Joe Cabo",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/mohamedsamara/mern-ecommerce/issues"
-  },
-  "homepage": "https://github.com/mohamedsamara/mern-ecommerce#readme",
   "dependencies": {
     "@fontsource/poppins": "^4.5.9",
     "autosuggest-highlight": "^3.1.1",
