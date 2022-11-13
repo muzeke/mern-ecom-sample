@@ -4,9 +4,9 @@
  *
  */
 
-import { push } from 'connected-react-router';
-import axios from 'axios';
-import { success } from 'react-notification-system-redux';
+import { push } from "connected-react-router";
+import axios from "axios";
+import { success } from "react-notification-system-redux";
 
 import {
   FETCH_ORDERS,
@@ -15,24 +15,24 @@ import {
   UPDATE_ORDER_STATUS,
   SET_ORDERS_LOADING,
   SET_ADVANCED_FILTERS,
-  CLEAR_ORDERS
-} from './constants';
+  CLEAR_ORDERS,
+} from "./constants";
 
-import { clearCart, getCartId } from '../Cart/actions';
-import { toggleCart } from '../Navigation/actions';
-import handleError from '../../utils/error';
+import { clearCart, getCartId } from "../Cart/actions";
+import { toggleCart } from "../Navigation/actions";
+import handleError from "../../utils/error";
 
-export const updateOrderStatus = value => {
+export const updateOrderStatus = (value) => {
   return {
     type: UPDATE_ORDER_STATUS,
-    payload: value
+    payload: value,
   };
 };
 
-export const setOrderLoading = value => {
+export const setOrderLoading = (value) => {
   return {
     type: SET_ORDERS_LOADING,
-    payload: value
+    payload: value,
   };
 };
 
@@ -41,23 +41,26 @@ export const fetchOrders = (page = 1) => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order`, {
-        params: {
-          page: page ?? 1,
-          limit: 20
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order`,
+        {
+          params: {
+            page: page ?? 1,
+            limit: 20,
+          },
         }
-      });
+      );
 
       const { orders, totalPages, currentPage, count } = response.data;
 
       dispatch({
         type: FETCH_ORDERS,
-        payload: orders
+        payload: orders,
       });
 
       dispatch({
         type: SET_ADVANCED_FILTERS,
-        payload: { totalPages, currentPage, count }
+        payload: { totalPages, currentPage, count },
       });
     } catch (error) {
       dispatch(clearOrders());
@@ -73,23 +76,26 @@ export const fetchAccountOrders = (page = 1) => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order/me`, {
-        params: {
-          page: page ?? 1,
-          limit: 20
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/me`,
+        {
+          params: {
+            page: page ?? 1,
+            limit: 20,
+          },
         }
-      });
+      );
 
       const { orders, totalPages, currentPage, count } = response.data;
 
       dispatch({
         type: FETCH_ORDERS,
-        payload: orders
+        payload: orders,
       });
 
       dispatch({
         type: SET_ADVANCED_FILTERS,
-        payload: { totalPages, currentPage, count }
+        payload: { totalPages, currentPage, count },
       });
     } catch (error) {
       dispatch(clearOrders());
@@ -100,20 +106,23 @@ export const fetchAccountOrders = (page = 1) => {
   };
 };
 
-export const searchOrders = filter => {
+export const searchOrders = (filter) => {
   return async (dispatch, getState) => {
     try {
       dispatch(setOrderLoading(true));
 
-      const response = await axios.get(`/api/order/search`, {
-        params: {
-          search: filter.value
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/search`,
+        {
+          params: {
+            search: filter.value,
+          },
         }
-      });
+      );
 
       dispatch({
         type: FETCH_SEARCHED_ORDERS,
-        payload: response.data.orders
+        payload: response.data.orders,
       });
     } catch (error) {
       handleError(error, dispatch);
@@ -130,11 +139,13 @@ export const fetchOrder = (id, withLoading = true) => {
         dispatch(setOrderLoading(true));
       }
 
-      const response = await axios.get(`/api/order/${id}`);
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/${id}`
+      );
 
       dispatch({
         type: FETCH_ORDER,
-        payload: response.data.order
+        payload: response.data.order,
       });
     } catch (error) {
       handleError(error, dispatch);
@@ -151,7 +162,9 @@ export const cancelOrder = () => {
     try {
       const order = getState().order.order;
 
-      await axios.delete(`/api/order/cancel/${order._id}`);
+      await axios.delete(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/cancel/${order._id}`
+      );
 
       dispatch(push(`/dashboard/orders`));
     } catch (error) {
@@ -165,11 +178,14 @@ export const updateOrderItemStatus = (itemId, status) => {
     try {
       const order = getState().order.order;
 
-      const response = await axios.put(`/api/order/status/item/${itemId}`, {
-        orderId: order._id,
-        cartId: order.cartId,
-        status
-      });
+      const response = await axios.put(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/status/item/${itemId}`,
+        {
+          orderId: order._id,
+          cartId: order.cartId,
+          status,
+        }
+      );
 
       if (response.data.orderCancelled) {
         dispatch(push(`/dashboard/orders`));
@@ -180,8 +196,8 @@ export const updateOrderItemStatus = (itemId, status) => {
 
       const successfulOptions = {
         title: `${response.data.message}`,
-        position: 'tr',
-        autoDismiss: 1
+        position: "tr",
+        autoDismiss: 1,
       };
 
       dispatch(success(successfulOptions));
@@ -194,14 +210,17 @@ export const updateOrderItemStatus = (itemId, status) => {
 export const addOrder = () => {
   return async (dispatch, getState) => {
     try {
-      const cartId = localStorage.getItem('cart_id');
+      const cartId = localStorage.getItem("cart_id");
       const total = getState().cart.cartTotal;
 
       if (cartId) {
-        const response = await axios.post(`/api/order/add`, {
-          cartId,
-          total
-        });
+        const response = await axios.post(
+          `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/order/add`,
+          {
+            cartId,
+            total,
+          }
+        );
 
         dispatch(push(`/order/success/${response.data.order._id}`));
         dispatch(clearCart());
@@ -214,7 +233,7 @@ export const addOrder = () => {
 
 export const placeOrder = () => {
   return (dispatch, getState) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
     const cartItems = getState().cart.cartItems;
 
@@ -230,6 +249,6 @@ export const placeOrder = () => {
 
 export const clearOrders = () => {
   return {
-    type: CLEAR_ORDERS
+    type: CLEAR_ORDERS,
   };
 };

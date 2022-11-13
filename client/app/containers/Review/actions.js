@@ -4,9 +4,9 @@
  *
  */
 
-import { success } from 'react-notification-system-redux';
-import axios from 'axios';
-import DOMPurify from 'dompurify';
+import { success } from "react-notification-system-redux";
+import axios from "axios";
+import DOMPurify from "dompurify";
 
 import {
   FETCH_REVIEWS,
@@ -17,17 +17,17 @@ import {
   REVIEW_CHANGE,
   RESET_REVIEW,
   SET_REVIEW_FORM_ERRORS,
-  SET_ADVANCED_FILTERS
-} from './constants';
-import handleError from '../../utils/error';
-import { allFieldsValidation, santizeFields } from '../../utils/validation';
+  SET_ADVANCED_FILTERS,
+} from "./constants";
+import handleError from "../../utils/error";
+import { allFieldsValidation, santizeFields } from "../../utils/validation";
 
 export const reviewChange = (name, value) => {
   let formData = {};
   formData[name] = value;
   return {
     type: REVIEW_CHANGE,
-    payload: formData
+    payload: formData,
   };
 };
 
@@ -37,19 +37,22 @@ export const fetchReviews = (n, v) => {
     try {
       dispatch({ type: SET_REVIEWS_LOADING, payload: true });
 
-      const response = await axios.get(`/api/review`, {
-        params: {
-          page: v ?? 1,
-          limit: 20
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review`,
+        {
+          params: {
+            page: v ?? 1,
+            limit: 20,
+          },
         }
-      });
+      );
 
       const { reviews, totalPages, currentPage, count } = response.data;
 
       dispatch({ type: FETCH_REVIEWS, payload: reviews });
       dispatch({
         type: SET_ADVANCED_FILTERS,
-        payload: { totalPages, currentPage, count }
+        payload: { totalPages, currentPage, count },
       });
     } catch (error) {
       handleError(error, dispatch);
@@ -59,10 +62,12 @@ export const fetchReviews = (n, v) => {
   };
 };
 
-export const approveReview = review => {
+export const approveReview = (review) => {
   return async (dispatch, getState) => {
     try {
-      await axios.put(`/api/review/approve/${review._id}`);
+      await axios.put(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review/approve/${review._id}`
+      );
 
       dispatch(fetchReviews());
     } catch (error) {
@@ -71,10 +76,12 @@ export const approveReview = review => {
   };
 };
 
-export const rejectReview = review => {
+export const rejectReview = (review) => {
   return async (dispatch, getState) => {
     try {
-      await axios.put(`/api/review/reject/${review._id}`);
+      await axios.put(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review/reject/${review._id}`
+      );
 
       dispatch(fetchReviews());
     } catch (error) {
@@ -84,22 +91,24 @@ export const rejectReview = review => {
 };
 
 // delete review api
-export const deleteReview = id => {
+export const deleteReview = (id) => {
   return async (dispatch, getState) => {
     try {
-      const response = await axios.delete(`/api/review/delete/${id}`);
+      const response = await axios.delete(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review/delete/${id}`
+      );
 
       const successfulOptions = {
         title: `${response.data.message}`,
-        position: 'tr',
-        autoDismiss: 1
+        position: "tr",
+        autoDismiss: 1,
       };
 
       if (response.data.success == true) {
         dispatch(success(successfulOptions));
         dispatch({
           type: REMOVE_REVIEW,
-          payload: id
+          payload: id,
         });
       }
     } catch (error) {
@@ -109,10 +118,12 @@ export const deleteReview = id => {
 };
 
 // fetch product reviews api
-export const fetchProductReviews = slug => {
+export const fetchProductReviews = (slug) => {
   return async (dispatch, getState) => {
     try {
-      const response = await axios.get(`/api/review/${slug}`);
+      const response = await axios.get(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review/${slug}`
+      );
 
       const { ratingSummary, totalRatings, totalReviews, totalSummary } =
         getProductReviewsSummary(response.data.reviews);
@@ -125,9 +136,9 @@ export const fetchProductReviews = slug => {
             ratingSummary,
             totalRatings,
             totalReviews,
-            totalSummary
-          }
-        }
+            totalSummary,
+          },
+        },
       });
     } catch (error) {
       handleError(error, dispatch);
@@ -139,10 +150,10 @@ export const addProductReview = () => {
   return async (dispatch, getState) => {
     try {
       const rules = {
-        title: 'required',
-        review: 'required',
-        rating: 'required|numeric|min:1',
-        isRecommended: 'required'
+        title: "required",
+        review: "required",
+        rating: "required|numeric|min:1",
+        isRecommended: "required",
       };
 
       const review = getState().review.reviewFormData;
@@ -153,15 +164,15 @@ export const addProductReview = () => {
         isRecommended: review.isRecommended.value,
         rating: review.rating,
         review: review.review,
-        title: review.title
+        title: review.title,
       };
 
       const { isValid, errors } = allFieldsValidation(newReview, rules, {
-        'required.title': 'Title is required.',
-        'required.review': 'Review is required.',
-        'required.rating': 'Rating is required.',
-        'min.rating': 'Rating is required.',
-        'required.isRecommended': 'Recommendable is required.'
+        "required.title": "Title is required.",
+        "required.review": "Review is required.",
+        "required.rating": "Rating is required.",
+        "min.rating": "Rating is required.",
+        "required.isRecommended": "Recommendable is required.",
       });
 
       if (!isValid) {
@@ -169,12 +180,15 @@ export const addProductReview = () => {
       }
 
       const santizedReview = santizeFields(newReview);
-      const response = await axios.post(`/api/review/add`, santizedReview);
+      const response = await axios.post(
+        `https://vm9qie5ock.execute-api.ap-southeast-1.amazonaws.com/prod/api/review/add`,
+        santizedReview
+      );
 
       const successfulOptions = {
         title: `${response.data.message}`,
-        position: 'tr',
-        autoDismiss: 1
+        position: "tr",
+        autoDismiss: 1,
       };
 
       if (response.data.success === true) {
@@ -193,7 +207,7 @@ export const addProductReview = () => {
   };
 };
 
-export const getProductReviewsSummary = reviews => {
+export const getProductReviewsSummary = (reviews) => {
   let ratingSummary = [{ 5: 0 }, { 4: 0 }, { 3: 0 }, { 2: 0 }, { 1: 0 }];
   let totalRatings = 0;
   let totalReviews = 0;
